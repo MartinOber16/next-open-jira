@@ -22,6 +22,9 @@ export default function handler(
 		case 'GET':
 			return getEntryById(req, res);
 
+		case 'DELETE':
+			return deleteEntryById(req, res);
+
 		default:
 			return res.status(400).json({ message: 'El método no existe' });
 	}
@@ -74,6 +77,23 @@ const getEntryById = async (
 
 	await db.connect();
 	const entryDB = await Entry.findById(id);
+	await db.disconnect();
+
+	if (!entryDB) {
+		return res.status(400).json({ message: 'No existe entrada para ID ' + id });
+	}
+
+	return res.status(200).json(entryDB);
+};
+
+const deleteEntryById = async (
+	req: NextApiRequest,
+	res: NextApiResponse<Data>
+) => {
+	const { id } = req.query;
+
+	await db.connect();
+	const entryDB = await Entry.findByIdAndDelete(id);
 	await db.disconnect();
 
 	if (!entryDB) {

@@ -34,8 +34,7 @@ const EntryPage: FC<Props> = ({ entry }) => {
 	const [inputValue, setInputValue] = useState(entry.description);
 	const [status, setStatus] = useState<EntryStatus>(entry.status);
 	const [touched, setTouched] = useState(false);
-
-	const { updateEntry } = useContext(EntriesContext);
+	const { updateEntry, deleteEntry } = useContext(EntriesContext);
 
 	const isNotValid = useMemo(
 		() => inputValue.length <= 0 && touched,
@@ -63,7 +62,7 @@ const EntryPage: FC<Props> = ({ entry }) => {
 	};
 
 	const onDelete = () => {
-		// TODO: Implementar el borrado!
+		deleteEntry(entry, true);
 	};
 
 	return (
@@ -125,7 +124,8 @@ const EntryPage: FC<Props> = ({ entry }) => {
 					bottom: 30,
 					right: 30,
 					backgroundColor: 'error.dark',
-				}}>
+				}}
+				onClick={onDelete}>
 				<DeleteOutlinedIcon />
 			</IconButton>
 		</Layout>

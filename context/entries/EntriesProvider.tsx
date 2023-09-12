@@ -4,6 +4,7 @@ import { Entry } from '@/interfaces';
 import { entriesApi } from '@/apis';
 
 import { useSnackbar } from 'notistack';
+import { useRouter } from 'next/router';
 
 export interface EntriesState {
 	entries: Entry[];
@@ -16,6 +17,7 @@ const Entries_INITIAL_STATE: EntriesState = {
 export const EntriesProvider: FC<PropsWithChildren> = ({ children }) => {
 	const [state, dispatch] = useReducer(entriesReducer, Entries_INITIAL_STATE);
 	const { enqueueSnackbar } = useSnackbar();
+	const router = useRouter();
 
 	const addNewEntry = async (description: string) => {
 		// const newEntry: Entry = {
@@ -45,6 +47,28 @@ export const EntriesProvider: FC<PropsWithChildren> = ({ children }) => {
 						horizontal: 'right',
 					},
 				});
+				router.push('/');
+			}
+		} catch (error) {
+			console.log({ error });
+		}
+	};
+
+	const deleteEntry = async (entry: Entry, showSnackbar = false) => {
+		try {
+			const { data } = await entriesApi.delete<Entry>(`/entries/${entry._id}`);
+			dispatch({ type: '[Entry] - Deleted-Entry', payload: data });
+
+			if (showSnackbar) {
+				enqueueSnackbar('Entrada eliminada', {
+					variant: 'success',
+					autoHideDuration: 1500,
+					anchorOrigin: {
+						vertical: 'top',
+						horizontal: 'right',
+					},
+				});
+				router.push('/');
 			}
 		} catch (error) {
 			console.log({ error });
@@ -67,6 +91,7 @@ export const EntriesProvider: FC<PropsWithChildren> = ({ children }) => {
 				// methods
 				addNewEntry,
 				updateEntry,
+				deleteEntry,
 			}}>
 			{children}
 		</EntriesContext.Provider>
